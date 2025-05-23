@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Угадай флаг</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      padding: 20px;
+    }
+    img {
+      width: 200px;
+      border-radius: 12px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    }
+    input {
+      padding: 10px;
+      font-size: 16px;
+      margin-top: 15px;
+      width: 60%;
+    }
+    button {
+      padding: 10px 20px;
+      margin-top: 10px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    .feedback {
+      margin-top: 15px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h2>🌍 Угадай страну по флагу</h2>
+  <img id="flag" src="" alt="Флаг страны"><br>
+  <input id="answer" placeholder="Введите название страны" autocomplete="off"/><br>
+  <button onclick="checkAnswer()">Проверить</button>
+  <div class="feedback" id="feedback"></div>
+
+  <script>
+    const countries = [
+      { name: "Россия", code: "ru" },
+      { name: "США", code: "us" },
+      { name: "Франция", code: "fr" },
+      { name: "Япония", code: "jp" },
+      { name: "Германия", code: "de" },
+      { name: "Италия", code: "it" },
+      { name: "Бразилия", code: "br" },
+      { name: "Канада", code: "ca" }
+    ];
+
+    let current = null;
+
+    function loadRandomFlag() {
+      const random = countries[Math.floor(Math.random() * countries.length)];
+      current = random;
+      document.getElementById("flag").src = `https://flagcdn.com/w320/${random.code}.png`;
+      document.getElementById("answer").value = "";
+      document.getElementById("feedback").textContent = "";
+    }
+
+    function normalize(text) {
+      return text.trim().toLowerCase();
+    }
+
+    function checkAnswer() {
+      const input = normalize(document.getElementById("answer").value);
+      const correct = normalize(current.name);
+      const feedback = document.getElementById("feedback");
+
+      if (input === correct) {
+        feedback.textContent = "✅ Правильно!";
+        setTimeout(loadRandomFlag, 1500);
+      } else {
+        feedback.textContent = "❌ Неверно, попробуй ещё.";
+      }
+    }
+
+    loadRandomFlag();
+  </script>
+</body>
+</html>
