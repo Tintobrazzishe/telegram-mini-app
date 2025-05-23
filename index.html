@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -15,29 +15,40 @@
       border-radius: 12px;
       box-shadow: 0 2px 6px rgba(0,0,0,0.2);
     }
-    input {
+    input, button {
       padding: 10px;
       font-size: 16px;
-      margin-top: 15px;
-      width: 60%;
-    }
-    button {
-      padding: 10px 20px;
       margin-top: 10px;
-      font-size: 16px;
-      cursor: pointer;
+      width: 80%;
+      max-width: 300px;
     }
     .feedback {
-      margin-top: 15px;
+      margin-top: 10px;
       font-weight: bold;
+    }
+    .score {
+      margin-bottom: 10px;
+      font-size: 18px;
+    }
+    .hint-options {
+      margin-top: 10px;
+    }
+    .hint-btn {
+      margin: 5px;
+      padding: 8px 12px;
+      cursor: pointer;
+      font-size: 14px;
     }
   </style>
 </head>
 <body>
   <h2>🌍 Угадай страну по флагу</h2>
+  <div class="score">Очки: <span id="score">0</span></div>
   <img id="flag" src="" alt="Флаг страны"><br>
-  <input id="answer" placeholder="Введите название страны" autocomplete="off"/><br>
+  <input id="answer" placeholder="Введите название страны"/><br>
   <button onclick="checkAnswer()">Проверить</button>
+  <button onclick="showHint()">Подсказка</button>
+  <div class="hint-options" id="hintOptions"></div>
   <div class="feedback" id="feedback"></div>
 
   <script>
@@ -49,10 +60,27 @@
       { name: "Германия", code: "de" },
       { name: "Италия", code: "it" },
       { name: "Бразилия", code: "br" },
-      { name: "Канада", code: "ca" }
+      { name: "Канада", code: "ca" },
+      { name: "Австралия", code: "au" },
+      { name: "Китай", code: "cn" },
+      { name: "Аргентина", code: "ar" },
+      { name: "Испания", code: "es" },
+      { name: "Португалия", code: "pt" },
+      { name: "Мексика", code: "mx" },
+      { name: "Турция", code: "tr" },
+      { name: "Польша", code: "pl" },
+      { name: "Швеция", code: "se" },
+      { name: "Индия", code: "in" },
+      { name: "Казахстан", code: "kz" },
+      { name: "Украина", code: "ua" }
     ];
 
     let current = null;
+    let score = 0;
+
+    function normalize(text) {
+      return text.trim().toLowerCase();
+    }
 
     function loadRandomFlag() {
       const random = countries[Math.floor(Math.random() * countries.length)];
@@ -60,23 +88,44 @@
       document.getElementById("flag").src = `https://flagcdn.com/w320/${random.code}.png`;
       document.getElementById("answer").value = "";
       document.getElementById("feedback").textContent = "";
+      document.getElementById("hintOptions").innerHTML = "";
     }
 
-    function normalize(text) {
-      return text.trim().toLowerCase();
-    }
-
-    function checkAnswer() {
-      const input = normalize(document.getElementById("answer").value);
+    function checkAnswer(userInput = null) {
+      const input = normalize(userInput || document.getElementById("answer").value);
       const correct = normalize(current.name);
       const feedback = document.getElementById("feedback");
 
       if (input === correct) {
         feedback.textContent = "✅ Правильно!";
+        score++;
+        document.getElementById("score").textContent = score;
         setTimeout(loadRandomFlag, 1500);
       } else {
         feedback.textContent = "❌ Неверно, попробуй ещё.";
       }
+    }
+
+    function showHint() {
+      const hintDiv = document.getElementById("hintOptions");
+      hintDiv.innerHTML = "";
+
+      const options = new Set();
+      options.add(current.name);
+      while (options.size < 4) {
+        const random = countries[Math.floor(Math.random() * countries.length)];
+        options.add(random.name);
+      }
+
+      const shuffled = Array.from(options).sort(() => Math.random() - 0.5);
+
+      shuffled.forEach(option => {
+        const btn = document.createElement("button");
+        btn.textContent = option;
+        btn.className = "hint-btn";
+        btn.onclick = () => checkAnswer(option);
+        hintDiv.appendChild(btn);
+      });
     }
 
     loadRandomFlag();
