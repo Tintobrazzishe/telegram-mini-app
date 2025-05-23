@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Моё первое мини-приложение</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    body {
+      background: #222;
+      color: #fff;
+      font-family: sans-serif;
+      padding: 20px;
+    }
+    button {
+      background: #30a3ec;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      font-size: 18px;
+      border-radius: 8px;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Привет, <span id="user">друг</span>!</h1>
+  <p>Это мини-приложение в Telegram ✨</p>
+  <button onclick="Telegram.WebApp.sendData('Привет из мини-аппа!')">Отправить данные боту</button>
+
+  <script>
+    const tg = window.Telegram.WebApp;
+    tg.expand();
+
+    const user = tg.initDataUnsafe?.user;
+    if (user) {
+      document.getElementById("user").textContent = user.first_name || "друг";
+    }
+  </script>
+</body>
+</html>
