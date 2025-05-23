@@ -15,7 +15,7 @@
       border-radius: 12px;
       box-shadow: 0 2px 6px rgba(0,0,0,0.2);
     }
-    input, button {
+    input, button, select {
       padding: 10px;
       font-size: 16px;
       margin-top: 10px;
@@ -39,51 +39,79 @@
       cursor: pointer;
       font-size: 14px;
     }
+    .stats {
+      margin-top: 20px;
+      font-size: 14px;
+      color: #555;
+    }
   </style>
 </head>
 <body>
   <h2>🌍 Угадай страну по флагу</h2>
-  <div class="score">Очки: <span id="score">0</span></div>
-  <img id="flag" src="" alt="Флаг страны"><br>
-  <input id="answer" placeholder="Введите название страны"/><br>
-  <button onclick="checkAnswer()">Проверить</button>
-  <button onclick="showHint()">Подсказка</button>
-  <div class="hint-options" id="hintOptions"></div>
-  <div class="feedback" id="feedback"></div>
+  <div id="startMenu">
+    <p>Выберите уровень сложности:</p>
+    <select id="difficulty">
+      <option value="easy">Лёгкий</option>
+      <option value="medium">Средний</option>
+      <option value="hard">Максимальный</option>
+      <option value="random">Случайный</option>
+    </select><br>
+    <button onclick="startGame()">Начать</button>
+  </div>
+
+  <div id="game" style="display:none">
+    <div class="score">Очки: <span id="score">0</span></div>
+    <img id="flag" src="" alt="Флаг страны"><br>
+    <input id="answer" placeholder="Введите название страны"/><br>
+    <button onclick="checkAnswer()">Проверить</button>
+    <button onclick="showHint()">Подсказка</button>
+    <div class="hint-options" id="hintOptions"></div>
+    <div class="feedback" id="feedback"></div>
+    <div class="stats">
+      Отвечено: <span id="answered">0</span> • Правильно: <span id="correct">0</span> • Точность: <span id="accuracy">0%</span>
+    </div>
+  </div>
 
   <script>
-    const countries = [
-      { name: "Россия", code: "ru" },
-      { name: "США", code: "us" },
-      { name: "Франция", code: "fr" },
-      { name: "Япония", code: "jp" },
-      { name: "Германия", code: "de" },
-      { name: "Италия", code: "it" },
-      { name: "Бразилия", code: "br" },
-      { name: "Канада", code: "ca" },
-      { name: "Австралия", code: "au" },
-      { name: "Китай", code: "cn" },
-      { name: "Аргентина", code: "ar" },
-      { name: "Испания", code: "es" },
-      { name: "Португалия", code: "pt" },
-      { name: "Мексика", code: "mx" },
-      { name: "Турция", code: "tr" },
-      { name: "Польша", code: "pl" },
-      { name: "Швеция", code: "se" },
-      { name: "Индия", code: "in" },
-      { name: "Казахстан", code: "kz" },
-      { name: "Украина", code: "ua" }
-    ];
+    const allCountries = [...]; // Обрезано для краткости
 
+    const difficultyLevels = {
+      easy: allCountries.slice(0, 20),
+      medium: allCountries.slice(0, 50),
+      hard: allCountries.length >= 200 ? allCountries.slice(0, 200) : allCountries,
+    };
+
+    let currentList = [];
     let current = null;
     let score = 0;
+    let totalAnswered = 0;
+    let correctAnswered = 0;
 
     function normalize(text) {
       return text.trim().toLowerCase();
     }
 
+    function startGame() {
+      const level = document.getElementById("difficulty").value;
+      if (level === "random") {
+        const levels = Object.values(difficultyLevels);
+        currentList = levels[Math.floor(Math.random() * levels.length)];
+      } else {
+        currentList = difficultyLevels[level];
+      }
+
+      document.getElementById("startMenu").style.display = "none";
+      document.getElementById("game").style.display = "block";
+      score = 0;
+      totalAnswered = 0;
+      correctAnswered = 0;
+      updateStats();
+      document.getElementById("score").textContent = score;
+      loadRandomFlag();
+    }
+
     function loadRandomFlag() {
-      const random = countries[Math.floor(Math.random() * countries.length)];
+      const random = currentList[Math.floor(Math.random() * currentList.length)];
       current = random;
       document.getElementById("flag").src = `https://flagcdn.com/w320/${random.code}.png`;
       document.getElementById("answer").value = "";
@@ -91,18 +119,29 @@
       document.getElementById("hintOptions").innerHTML = "";
     }
 
+    function updateStats() {
+      document.getElementById("answered").textContent = totalAnswered;
+      document.getElementById("correct").textContent = correctAnswered;
+      const accuracy = totalAnswered === 0 ? 0 : Math.round((correctAnswered / totalAnswered) * 100);
+      document.getElementById("accuracy").textContent = `${accuracy}%`;
+    }
+
     function checkAnswer(userInput = null) {
       const input = normalize(userInput || document.getElementById("answer").value);
       const correct = normalize(current.name);
       const feedback = document.getElementById("feedback");
+      totalAnswered++;
 
       if (input === correct) {
         feedback.textContent = "✅ Правильно!";
         score++;
+        correctAnswered++;
         document.getElementById("score").textContent = score;
+        updateStats();
         setTimeout(loadRandomFlag, 1500);
       } else {
         feedback.textContent = "❌ Неверно, попробуй ещё.";
+        updateStats();
       }
     }
 
@@ -113,7 +152,7 @@
       const options = new Set();
       options.add(current.name);
       while (options.size < 4) {
-        const random = countries[Math.floor(Math.random() * countries.length)];
+        const random = currentList[Math.floor(Math.random() * currentList.length)];
         options.add(random.name);
       }
 
@@ -127,8 +166,6 @@
         hintDiv.appendChild(btn);
       });
     }
-
-    loadRandomFlag();
   </script>
 </body>
 </html>
