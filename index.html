@@ -221,6 +221,7 @@
       streak = 0;
       doublePoints = false;
       basePoints = 0;
+      startTimer()
       updateStats();
       document.getElementById("score").textContent = score;
       loadRandomFlag();
@@ -228,6 +229,7 @@
 
     function loadRandomFlag() {
       if (totalAnswered >= maxQuestions) {
+        stopTimer();
         document.getElementById("game").style.display = "none";
         document.getElementById("summary").style.display = "block";
         document.getElementById("finalScore").textContent = score;
