@@ -9,6 +9,8 @@
       font-family: sans-serif;
       text-align: center;
       padding: 20px;
+      background-color: var(--tg-theme-bg-color, #fff);
+      color: var(--tg-theme-text-color, #000);
     }
     img {
       width: 200px;
@@ -68,60 +70,47 @@
     <div class="hint-options" id="hintOptions"></div>
     <div class="feedback" id="feedback"></div>
     <div class="stats">
-      Отвечено: <span id="answered">0</span> • Правильно: <span id="correct">0</span> • Точность: <span id="accuracy">0%</span>
+      Вопросов: <span id="answered">0</span>/10 • Правильно: <span id="correct">0</span> • Точность: <span id="accuracy">0%</span>
     </div>
   </div>
 
-  <script src="https://flagcdn.com/en/codes.js"></script>
   <script>
-    const countryNamesRu = {
-      af: "Афганистан", al: "Албания", dz: "Алжир", ad: "Андорра", ao: "Ангола",
-      ag: "Антигуа и Барбуда", ar: "Аргентина", am: "Армения", au: "Австралия", at: "Австрия",
-      az: "Азербайджан", bs: "Багамские Острова", bh: "Бахрейн", bd: "Бангладеш", bb: "Барбадос",
-      by: "Беларусь", be: "Бельгия", bz: "Белиз", bj: "Бенин", bt: "Бутан",
-      bo: "Боливия", ba: "Босния и Герцеговина", bw: "Ботсвана", br: "Бразилия", bn: "Бруней",
-      bg: "Болгария", bf: "Буркина-Фасо", bi: "Бурунди", cv: "Кабо-Верде", kh: "Камбоджа",
-      cm: "Камерун", ca: "Канада", cf: "ЦАР", td: "Чад", cl: "Чили",
-      cn: "Китай", co: "Колумбия", km: "Коморы", cg: "Конго", cd: "ДР Конго",
-      cr: "Коста-Рика", hr: "Хорватия", cu: "Куба", cy: "Кипр", cz: "Чехия",
-      dk: "Дания", dj: "Джибути", dm: "Доминика", do: "Доминиканская Республика", ec: "Эквадор",
-      eg: "Египет", sv: "Сальвадор", gq: "Экваториальная Гвинея", er: "Эритрея", ee: "Эстония",
-      sz: "Эсватини", et: "Эфиопия", fj: "Фиджи", fi: "Финляндия", fr: "Франция",
-      ga: "Габон", gm: "Гамбия", ge: "Грузия", de: "Германия", gh: "Гана",
-      gr: "Греция", gd: "Гренада", gt: "Гватемала", gn: "Гвинея", gw: "Гвинея-Бисау",
-      gy: "Гайана", ht: "Гаити", hn: "Гондурас", hu: "Венгрия", is: "Исландия",
-      in: "Индия", id: "Индонезия", ir: "Иран", iq: "Ирак", ie: "Ирландия",
-      il: "Израиль", it: "Италия", ci: "Кот-д’Ивуар", jm: "Ямайка", jp: "Япония",
-      jo: "Иордания", kz: "Казахстан", ke: "Кения", ki: "Кирибати", kr: "Южная Корея",
-      kw: "Кувейт", kg: "Киргизия", la: "Лаос", lv: "Латвия", lb: "Ливан",
-      ls: "Лесото", lr: "Либерия", ly: "Ливия", li: "Лихтенштейн", lt: "Литва",
-      lu: "Люксембург", mg: "Мадагаскар", mw: "Малави", my: "Малайзия", mv: "Мальдивы",
-      ml: "Мали", mt: "Мальта", mh: "Маршалловы Острова", mr: "Мавритания", mu: "Маврикий",
-      mx: "Мексика", fm: "Микронезия", md: "Молдова", mc: "Монако", mn: "Монголия",
-      me: "Черногория", ma: "Марокко", mz: "Мозамбик", mm: "Мьянма", na: "Намибия",
-      nr: "Науру", np: "Непал", nl: "Нидерланды", nz: "Новая Зеландия", ni: "Никарагуа",
-      ne: "Нигер", ng: "Нигерия", mk: "Северная Македония", no: "Норвегия", om: "Оман",
-      pk: "Пакистан", pw: "Палау", pa: "Панама", pg: "Папуа — Новая Гвинея", py: "Парагвай",
-      pe: "Перу", ph: "Филиппины", pl: "Польша", pt: "Португалия", qa: "Катар",
-      ro: "Румыния", ru: "Россия", rw: "Руанда", kn: "Сент-Китс и Невис", lc: "Сент-Люсия",
-      vc: "Сент-Винсент и Гренадины", ws: "Самоа", sm: "Сан-Марино", st: "Сан-Томе и Принсипи", sa: "Саудовская Аравия",
-      sn: "Сенегал", rs: "Сербия", sc: "Сейшелы", sl: "Сьерра-Леоне", sg: "Сингапур",
-      sk: "Словакия", si: "Словения", sb: "Соломоновы Острова", so: "Сомали", za: "ЮАР",
-      ss: "Южный Судан", es: "Испания", lk: "Шри-Ланка", sd: "Судан", sr: "Суринам",
-      se: "Швеция", ch: "Швейцария", sy: "Сирия", tw: "Тайвань", tj: "Таджикистан",
-      tz: "Танзания", th: "Таиланд", tl: "Восточный Тимор", tg: "Того", to: "Тонга",
-      tt: "Тринидад и Тобаго", tn: "Тунис", tr: "Турция", tm: "Туркмения", tv: "Тувалу",
-      ug: "Уганда", ua: "Украина", ae: "ОАЭ", gb: "Великобритания", us: "США",
-      uy: "Уругвай", uz: "Узбекистан", vu: "Вануату", va: "Ватикан", ve: "Венесуэла",
-      vn: "Вьетнам", ye: "Йемен", zm: "Замбия", zw: "Зимбабве"
-    };
-
-    const allCountries = Object.entries(countryNamesRu).map(([code, name]) => ({ code, name }));
+    const allCountries = [
+      { name: "Россия", code: "ru" }, { name: "США", code: "us" }, { name: "Канада", code: "ca" },
+      { name: "Германия", code: "de" }, { name: "Франция", code: "fr" }, { name: "Италия", code: "it" },
+      { name: "Испания", code: "es" }, { name: "Великобритания", code: "gb" }, { name: "Япония", code: "jp" },
+      { name: "Китай", code: "cn" }, { name: "Бразилия", code: "br" }, { name: "Индия", code: "in" },
+      { name: "Австралия", code: "au" }, { name: "Мексика", code: "mx" }, { name: "Аргентина", code: "ar" },
+      { name: "Египет", code: "eg" }, { name: "Турция", code: "tr" }, { name: "Южная Корея", code: "kr" },
+      { name: "ЮАР", code: "za" }, { name: "Саудовская Аравия", code: "sa" }, { name: "Нидерланды", code: "nl" },
+      { name: "Швеция", code: "se" }, { name: "Норвегия", code: "no" }, { name: "Финляндия", code: "fi" },
+      { name: "Польша", code: "pl" }, { name: "Украина", code: "ua" }, { name: "Беларусь", code: "by" },
+      { name: "Казахстан", code: "kz" }, { name: "Азербайджан", code: "az" }, { name: "Грузия", code: "ge" },
+      { name: "Армения", code: "am" }, { name: "Иран", code: "ir" }, { name: "Ирак", code: "iq" },
+      { name: "Пакистан", code: "pk" }, { name: "Афганистан", code: "af" }, { name: "Израиль", code: "il" },
+      { name: "Сирия", code: "sy" }, { name: "Ливан", code: "lb" }, { name: "Иордания", code: "jo" },
+      { name: "Греция", code: "gr" }, { name: "Болгария", code: "bg" }, { name: "Румыния", code: "ro" },
+      { name: "Чехия", code: "cz" }, { name: "Словакия", code: "sk" }, { name: "Венгрия", code: "hu" },
+      { name: "Хорватия", code: "hr" }, { name: "Сербия", code: "rs" }, { name: "Черногория", code: "me" },
+      { name: "Словения", code: "si" }, { name: "Босния и Герцеговина", code: "ba" },
+      { name: "Дания", code: "dk" }, { name: "Швейцария", code: "ch" }, { name: "Исландия", code: "is" },
+      { name: "Португалия", code: "pt" }, { name: "Новая Зеландия", code: "nz" }, { name: "Таиланд", code: "th" },
+      { name: "Малайзия", code: "my" }, { name: "Сингапур", code: "sg" }, { name: "Индонезия", code: "id" },
+      { name: "Филиппины", code: "ph" }, { name: "Вьетнам", code: "vn" }, { name: "Шри-Ланка", code: "lk" },
+      { name: "Бангладеш", code: "bd" }, { name: "Монголия", code: "mn" }, { name: "Непал", code: "np" },
+      { name: "Камбоджа", code: "kh" }, { name: "Лаос", code: "la" }, { name: "Мьянма", code: "mm" },
+      { name: "Куба", code: "cu" }, { name: "Чили", code: "cl" }, { name: "Перу", code: "pe" },
+      { name: "Колумбия", code: "co" }, { name: "Венесуэла", code: "ve" }, { name: "Боливия", code: "bo" },
+      { name: "Эквадор", code: "ec" }, { name: "Парагвай", code: "py" }, { name: "Уругвай", code: "uy" },
+      { name: "Панама", code: "pa" }, { name: "Коста-Рика", code: "cr" }, { name: "Никарагуа", code: "ni" },
+      { name: "Гондурас", code: "hn" }, { name: "Гватемала", code: "gt" }, { name: "Сальвадор", code: "sv" },
+      { name: "Доминикана", code: "do" }, { name: "Гаити", code: "ht" }, { name: "Ямайка", code: "jm" }
+    ];
 
     const difficultyLevels = {
       easy: allCountries.slice(0, 20),
       medium: allCountries.slice(0, 50),
-      hard: allCountries.slice(0, 200),
+      hard: allCountries.length >= 120 ? allCountries.slice(0, 120) : allCountries
     };
 
     let currentList = [];
@@ -129,6 +118,9 @@
     let score = 0;
     let totalAnswered = 0;
     let correctAnswered = 0;
+    let streak = 0;
+    let doublePoints = false;
+    const maxQuestions = 10;
 
     function normalize(text) {
       return text.trim().toLowerCase();
@@ -148,12 +140,19 @@
       score = 0;
       totalAnswered = 0;
       correctAnswered = 0;
+      streak = 0;
+      doublePoints = false;
       updateStats();
       document.getElementById("score").textContent = score;
       loadRandomFlag();
     }
 
     function loadRandomFlag() {
+      if (totalAnswered >= maxQuestions) {
+        alert(`Игра окончена! Ваш счёт: ${score}`);
+        location.reload();
+        return;
+      }
       const random = currentList[Math.floor(Math.random() * currentList.length)];
       current = random;
       document.getElementById("flag").src = `https://flagcdn.com/w320/${random.code}.png`;
@@ -176,19 +175,25 @@
       totalAnswered++;
 
       if (input === correct) {
-        feedback.textContent = "✅ Правильно!";
-        score++;
+        streak++;
+        if (streak >= 3) doublePoints = true;
+        const points = doublePoints ? 2 : 1;
+        feedback.textContent = `✅ Правильно! +${points} очков`;
+        score += points;
         correctAnswered++;
         document.getElementById("score").textContent = score;
         updateStats();
         setTimeout(loadRandomFlag, 1500);
       } else {
         feedback.textContent = "❌ Неверно, попробуй ещё.";
+        streak = 0;
+        doublePoints = false;
         updateStats();
       }
     }
 
     function showHint() {
+      doublePoints = false;
       const hintDiv = document.getElementById("hintOptions");
       hintDiv.innerHTML = "";
 
