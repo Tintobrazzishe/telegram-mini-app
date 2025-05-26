@@ -46,6 +46,15 @@
       font-size: 14px;
       color: #555;
     }
+    #summary {
+      display: none;
+      font-size: 18px;
+      margin-top: 20px;
+    }
+    #restartBtn {
+      margin-top: 10px;
+      padding: 10px;
+    }
   </style>
 </head>
 <body>
@@ -72,6 +81,12 @@
     <div class="stats">
       Вопросов: <span id="answered">0</span>/10 • Правильно: <span id="correct">0</span> • Точность: <span id="accuracy">0%</span>
     </div>
+  </div>
+
+  <div id="summary">
+    <p>🎉 Игра окончена!</p>
+    <p>Ваш итоговый счёт: <span id="finalScore">0</span></p>
+    <button id="restartBtn" onclick="restartGame()">Играть снова</button>
   </div>
 
   <script>
@@ -137,6 +152,7 @@
 
       document.getElementById("startMenu").style.display = "none";
       document.getElementById("game").style.display = "block";
+      document.getElementById("summary").style.display = "none";
       score = 0;
       totalAnswered = 0;
       correctAnswered = 0;
@@ -149,8 +165,9 @@
 
     function loadRandomFlag() {
       if (totalAnswered >= maxQuestions) {
-        alert(`Игра окончена! Ваш счёт: ${score}`);
-        location.reload();
+        document.getElementById("game").style.display = "none";
+        document.getElementById("summary").style.display = "block";
+        document.getElementById("finalScore").textContent = score;
         return;
       }
       const random = currentList[Math.floor(Math.random() * currentList.length)];
@@ -213,6 +230,12 @@
         btn.onclick = () => checkAnswer(option);
         hintDiv.appendChild(btn);
       });
+    }
+
+    function restartGame() {
+      document.getElementById("startMenu").style.display = "block";
+      document.getElementById("game").style.display = "none";
+      document.getElementById("summary").style.display = "none";
     }
   </script>
 </body>
