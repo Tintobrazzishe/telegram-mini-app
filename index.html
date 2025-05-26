@@ -72,10 +72,12 @@
       <option value="random">Случайный</option>
     </select><br>
     <button onclick="startGame()">Начать</button>
+    <button id="recordButton" onclick="showLeaderboardOnly()">Таблица рекордов</button>
   </div>
 
   <div id="game" style="display:none">
     <div class="score">Очки: <span id="score">0</span></div>
+    <div class="score">⏱️ Время: <span id="timer">0</span> сек</div>
     <img id="flag" src="" alt="Флаг страны"><br>
     <input id="answer" placeholder="Введите название страны"/><br>
     <button onclick="checkAnswer()">Проверить</button>
@@ -90,10 +92,64 @@
   <div id="summary">
     <p>🎉 Игра окончена!</p>
     <p>Ваш итоговый счёт: <span id="finalScore">0</span></p>
+    <p>⏱️ Время: <span id="finalTime">0</span> сек</p>
     <div id="leaderboard"></div>
     <button id="restartBtn" onclick="restartGame()">Играть снова</button>
   </div>
 
+  <script>
+    let timerInterval;
+    let timerSeconds = 0;
+
+    function startTimer() {
+      timerSeconds = 0;
+      document.getElementById("timer").textContent = timerSeconds;
+      timerInterval = setInterval(() => {
+        timerSeconds++;
+        document.getElementById("timer").textContent = timerSeconds;
+      }, 1000);
+    }
+
+    function stopTimer() {
+      clearInterval(timerInterval);
+      document.getElementById("finalTime").textContent = timerSeconds;
+    }
+
+    function showLeaderboardOnly() {
+      const leaderboardDiv = document.getElementById("leaderboard");
+      const scores = JSON.parse(localStorage.getItem("flagGameScores")) || [];
+      leaderboardDiv.innerHTML = `<h3>🏆 Таблица лидеров</h3><ol>${scores.map(e => `<li>${e.score} очков — уровень: ${e.level} — ${e.time} сек</li>`).join("")}</ol>`;
+      document.getElementById("startMenu").style.display = "none";
+      document.getElementById("summary").style.display = "block";
+    }
+
+    function updateLeaderboard(newScore) {
+      const leaderboardDiv = document.getElementById("leaderboard");
+      const level = document.getElementById("difficulty").value;
+      const scores = JSON.parse(localStorage.getItem("flagGameScores")) || [];
+      scores.push({ score: newScore, level, time: timerSeconds });
+      scores.sort((a, b) => b.score - a.score);
+      const topScores = scores.slice(0, 5);
+      localStorage.setItem("flagGameScores", JSON.stringify(topScores));
+      leaderboardDiv.innerHTML = `<h3>🏆 Таблица лидеров</h3><ol>${topScores.map(e => `<li>${e.score} очков — уровень: ${e.level} — ${e.time} сек</li>`).join("")}</ol>`;
+    }
+
+    // Вызов таймера при старте игры
+    const originalStartGame = startGame;
+    startGame = function() {
+      originalStartGame();
+      startTimer();
+    }
+
+    // Остановка таймера при завершении
+    const originalLoadRandomFlag = loadRandomFlag;
+    loadRandomFlag = function() {
+      if (totalAnswered >= maxQuestions) {
+        stopTimer();
+      }
+      originalLoadRandomFlag();
+    }
+  </script>
   <script>
     const allCountries = [
       { name: "Россия", code: "ru" }, { name: "США", code: "us" }, { name: "Канада", code: "ca" },
