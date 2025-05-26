@@ -55,6 +55,10 @@
       margin-top: 10px;
       padding: 10px;
     }
+    #leaderboard {
+      margin-top: 20px;
+      font-size: 16px;
+    }
   </style>
 </head>
 <body>
@@ -86,6 +90,7 @@
   <div id="summary">
     <p>🎉 Игра окончена!</p>
     <p>Ваш итоговый счёт: <span id="finalScore">0</span></p>
+    <div id="leaderboard"></div>
     <button id="restartBtn" onclick="restartGame()">Играть снова</button>
   </div>
 
@@ -136,6 +141,7 @@
     let streak = 0;
     let doublePoints = false;
     const maxQuestions = 10;
+    let basePoints = 0;
 
     function normalize(text) {
       return text.trim().toLowerCase();
@@ -158,6 +164,7 @@
       correctAnswered = 0;
       streak = 0;
       doublePoints = false;
+      basePoints = 0;
       updateStats();
       document.getElementById("score").textContent = score;
       loadRandomFlag();
@@ -168,6 +175,7 @@
         document.getElementById("game").style.display = "none";
         document.getElementById("summary").style.display = "block";
         document.getElementById("finalScore").textContent = score;
+        updateLeaderboard(score);
         return;
       }
       const random = currentList[Math.floor(Math.random() * currentList.length)];
@@ -194,9 +202,15 @@
       if (input === correct) {
         streak++;
         if (streak >= 3) doublePoints = true;
-        const points = doublePoints ? 2 : 1;
+        let points = 1;
+        if (doublePoints) {
+          points = 2;
+          basePoints = (basePoints + 1) * 2;
+        } else {
+          basePoints += 1;
+        }
+        score = basePoints;
         feedback.textContent = `✅ Правильно! +${points} очков`;
-        score += points;
         correctAnswered++;
         document.getElementById("score").textContent = score;
         updateStats();
@@ -205,6 +219,7 @@
         feedback.textContent = "❌ Неверно, попробуй ещё.";
         streak = 0;
         doublePoints = false;
+        basePoints = score; // сохраняем текущие очки
         updateStats();
       }
     }
@@ -236,6 +251,16 @@
       document.getElementById("startMenu").style.display = "block";
       document.getElementById("game").style.display = "none";
       document.getElementById("summary").style.display = "none";
+    }
+
+    function updateLeaderboard(newScore) {
+      const leaderboardDiv = document.getElementById("leaderboard");
+      const scores = JSON.parse(localStorage.getItem("flagGameScores")) || [];
+      scores.push(newScore);
+      scores.sort((a, b) => b - a);
+      const topScores = scores.slice(0, 5);
+      localStorage.setItem("flagGameScores", JSON.stringify(topScores));
+      leaderboardDiv.innerHTML = `<h3>🏆 Таблица лидеров</h3><ol>${topScores.map(s => `<li>${s} очков</li>`).join("")}</ol>`;
     }
   </script>
 </body>
